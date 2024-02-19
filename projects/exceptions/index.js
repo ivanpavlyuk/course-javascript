@@ -1,5 +1,7 @@
 /* ДЗ 3 - работа с исключениями и отладчиком */
 
+import { Exception } from 'handlebars';
+
 /*
  Задание 1:
 
@@ -20,7 +22,19 @@
    isAllTrue([1, 2, 3, 4, 5], n => n < 10) // вернет true (потому что все элементы массива меньше 10)
    isAllTrue([100, 2, 3, 4, 5], n => n < 10) // вернет false (потому что как минимум первый элемент больше 10)
  */
-function isAllTrue(array, fn) {}
+function isAllTrue(array, fn) {
+  if (!Array.isArray(array) || array.length === 0) throw new Exception('empty array');
+  if (typeof fn !== 'function') throw new Exception('fn is not a function');
+
+  let isTrue = true;
+  for (let i = 0; i < array.length; i++) {
+    if (!fn(array[i])) {
+      isTrue = false;
+      break;
+    }
+  }
+  return isTrue;
+}
 
 /*
  Задание 2:
@@ -42,7 +56,19 @@ function isAllTrue(array, fn) {}
    isSomeTrue([1, 2, 30, 4, 5], n => n > 20) // вернет true (потому что в массиве есть хотя бы один элемент больше 20)
    isSomeTrue([1, 2, 3, 4, 5], n => n > 20) // вернет false (потому что в массиве нет ни одного элемента больше 20)
  */
-function isSomeTrue(array, fn) {}
+function isSomeTrue(array, fn) {
+  if (!Array.isArray(array) || array.length === 0) throw new Exception('empty array');
+  if (typeof fn !== 'function') throw new Exception('fn is not a function');
+
+  let isTrue = false;
+  for (let i = 0; i < array.length; i++) {
+    if (fn(array[i])) {
+      isTrue = true;
+      break;
+    }
+  }
+  return isTrue;
+}
 
 /*
  Задание 3:
@@ -56,7 +82,19 @@ function isSomeTrue(array, fn) {}
    - fn не является функцией (с текстом "fn is not a function")
      для проверки на функцию вам может помочь оператор typeof
  */
-function returnBadArguments() {}
+function returnBadArguments(fn, ...args) {
+  if (typeof fn !== 'function') throw new Exception('fn is not a function');
+
+  const result = [];
+  for (let i = 0; i < args.length; i++) {
+    try {
+      fn(args[i]);
+    } catch (e) {
+      result.push(args[i]);
+    }
+  }
+  return result;
+}
 
 /*
  Задание 4:
@@ -84,7 +122,26 @@ function returnBadArguments() {}
    console.log(calc.div(2, 2)); // выведет 2.5 (10 / 2 / 2)
    console.log(calc.div(2, 0)); // выбросит исключение, потому что один из аргументов равен 0
  */
-function calculator(number) {}
+function calculator(number = 0) {
+  if (typeof number !== 'number') throw new Exception('number is not a number');
+  return {
+    sum(...args) {
+      return args.reduce((a, b) => a + b, number);
+    },
+    dif(...args) {
+      return args.reduce((a, b) => a - b, number);
+    },
+    div(...args) {
+      args.forEach((e) => {
+        if (e === 0) throw new Exception('division by 0');
+      });
+      return args.reduce((a, b) => a / b, number);
+    },
+    mul(...args) {
+      return args.reduce((a, b) => a * b, number);
+    },
+  };
+}
 
 /* При решении задач, постарайтесь использовать отладчик */
 
