@@ -18,6 +18,7 @@ export default {
 
     const photoIndex = parseInt(Math.random() * photosDB[index].length);
     const photo = photosDB[index][photoIndex];
+
     return {
       friend,
       url: photo.url,
