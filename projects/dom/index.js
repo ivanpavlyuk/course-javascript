@@ -11,6 +11,9 @@
    createDivWithText('loftschool') // создаст элемент div, поместит в него 'loftschool' и вернет созданный элемент
  */
 function createDivWithText(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div;
 }
 
 /*
@@ -22,6 +25,7 @@ function createDivWithText(text) {
    prepend(document.querySelector('#one'), document.querySelector('#two')) // добавит элемент переданный первым аргументом в начало элемента переданного вторым аргументом
  */
 function prepend(what, where) {
+  where.insertBefore(what, where.firstChild);
 }
 
 /*
@@ -44,6 +48,17 @@ function prepend(what, where) {
    findAllPSiblings(document.body) // функция должна вернуть массив с элементами div и span т.к. следующим соседом этих элементов является элемент с тегом P
  */
 function findAllPSiblings(where) {
+  const elements = where.children;
+  const result = [];
+
+  for (let index = 0; index < elements.length - 1; index++) {
+    const element = elements[index];
+    const nextElement = elements[index + 1];
+    if (nextElement.tagName === 'P') {
+      result.push(element);
+    }
+  }
+  return result;
 }
 
 /*
@@ -66,7 +81,7 @@ function findAllPSiblings(where) {
 function findError(where) {
   const result = [];
 
-  for (const child of where.childNodes) {
+  for (const child of where.children) {
     result.push(child.textContent);
   }
 
@@ -86,6 +101,11 @@ function findError(where) {
    должно быть преобразовано в <div></div><p></p>
  */
 function deleteTextNodes(where) {
+  for (const element of where.childNodes) {
+    if (element.nodeType === 3) {
+      where.removeChild(element);
+    }
+  }
 }
 
 /*
@@ -109,6 +129,37 @@ function deleteTextNodes(where) {
    }
  */
 function collectDOMStat(root) {
+  const result = {
+    tags: {},
+    classes: {},
+    texts: 0,
+  };
+  function goInDepth(domNode) {
+    for (const node of domNode.childNodes) {
+      if (node.nodeType === 3) {
+        result.texts++;
+        continue;
+      }
+
+      let tagNumber = result.tags[`${node.tagName}`];
+      result.tags[`${node.tagName}`] = tagNumber === undefined ? 1 : ++tagNumber;
+
+      for (const nodeClass of node.classList) {
+        let classesNumber = result.classes[`${nodeClass}`];
+        result.classes[`${nodeClass}`] =
+          classesNumber === undefined ? 1 : ++classesNumber;
+      }
+
+      if (node.childNodes.length === 0) {
+        continue;
+      } else {
+        goInDepth(node);
+      }
+    }
+  }
+
+  goInDepth(root);
+  return result;
 }
 
 export {
